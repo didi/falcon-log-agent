@@ -1,0 +1,140 @@
+#!/bin/bash
+workspace=$(cd $(dirname $0) && pwd)
+cd $workspace
+
+module=log-agent
+app=falcon-$module
+conf=cfg.json
+pidfile=var/app.pid
+logfile=log/app.log
+
+mkdir -p var &>/dev/null
+mkdir -p log &>/dev/null
+
+function install() {
+    stop_old
+    for i in `seq 1 10`
+    do
+    pidof log-analysis | grep -q '[0-9]'  || echo 'old log-analysis stop success'; return 0
+    stop_old
+    sleep 1
+    done
+    echo 'install error'
+}
+
+function stop_old() {
+    /usr/local/sbin/monit stop log-analysis 
+    monit stop log-analysis
+}
+
+function stop_pid() {
+    pid=$(cat $pidfile)
+    # 校验pid与进程名是否一致  || 根据进程名获取pid，要求父进程ppid==1(适用于root启动的agent)
+    ps -p ${pid} | grep -q ${app} || pid=$(ps -o ppid,pid $(pidof ${app}) | awk '$1==1 {print $2}')
+    if [ -n ${pid} ]; then
+        kill ${pid} || kill -9 ${pid}
+    fi
+    echo "$app stoped... or not start"
+}
+
+function start() {
+    check_pid
+    running=$?
+    if [ $running -gt 0 ];then
+        echo -n "[old process]still running, quit, pid = "
+        cat $pidfile
+    else
+        nohup ./$app -c $conf >>$logfile 2>&1 &
+        echo $! > $pidfile
+        echo "start ok, pid=$!"
+    fi
+}
+
+function stop() {
+    stop_old
+    kill `get_pid`
+    for i in `seq 1 20`
+    do
+    sleep 1
+    check_pid
+    running=$?
+    if [ $running -gt 0 ];then
+        echo -n "[restart]still running, wait.. , pid = "
+            cat $pidfile
+            if [ $i -gt 10 ]
+            then
+                kill -9 `get_pid`
+            fi
+            continue
+    else
+        echo "stoped"
+        break
+    fi
+    done
+}
+
+function shutdown() {
+    pid=`get_pid`
+    kill -9 $pid
+    echo "stoped"
+}
+
+function restart() {
+    stop
+    sleep 1
+    start
+}
+
+function status() {
+    check_pid
+    running=$?
+    if [ $running -gt 0 ];then
+        echo -n "running, pid="
+        cat $pidfile
+    else
+        echo "stoped"
+    fi
+}
+
+function get_pid() {
+    if [ -f $pidfile ];then
+        cat $pidfile
+    else
+        pid=`ps aux | grep $app | grep $conf | awk '{print $2}'`
+        if [ "x_$pid" != "x_" ]; then
+            echo $pid > $pidfile
+            cat $pidfile
+        fi
+    fi
+}
+
+function check_pid() {
+    pid=`get_pid`
+    if [ "x_" != "x_$pid" ]; then
+        running=`ps -p $pid|grep -v "PID TTY" |wc -l`
+        return $running
+    fi
+    return 0
+}
+
+action=$1
+case $action in
+    "install" )
+        install
+        ;;
+    "start" )
+        start
+        ;;
+    "stop" )
+        stop
+        ;;
+    "kill" )
+        shutdown
+        ;;
+    "restart" )
+        restart
+        ;;
+    "status" )
+        status
+        ;;
+esac

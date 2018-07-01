@@ -1,0 +1,32 @@
+[
+    {
+        "id":1,
+        "name":"流量500错误数",
+        "file_path":"/home/work/myService/log/access.log",
+        "time_format":"dd/mmm/yyyy:HH:MM:SS",
+        "pattern":"service error 500, num=(\\d+)",
+        "exclude":"unimport-request",
+        "step":10,
+        "tags":{
+            "provice" : "province=(\\s+)"
+        },
+        "func":"cnt",
+        "degree":6,
+        "comment":"我是备注"
+    },
+    {
+        "id":1,
+        "name":"流量500错误数",
+        "file_path":"/home/work/myService/log/access.log",
+        "time_format":"dd/mmm/yyyy:HH:MM:SS",
+        "pattern":"service error 500, num=(\\d+)",
+        "exclude":"unimport-request",
+        "step":10,
+        "tags":{
+            "provice" : "province=(\\s+)"
+        },
+        "func":"cnt",
+        "degree":6,
+        "comment":"我是备注"
+    }
+]

@@ -1,0 +1,14 @@
+*.swp
+.DS_Store
+tmpGodeps/
+.gitversion
+log-agent
+pkg/
+var/
+log/
+falcon-log-agent
+output/
+.idea/*
+cfg/dev.test.cfg
+cfg/strategy.test.json
+falcon-log-agent.tar.gz
