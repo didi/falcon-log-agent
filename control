@@ -4,7 +4,8 @@ cd $workspace
 
 module=log-agent
 app=falcon-$module
-conf=cfg.json
+conf=cfg/cfg.json
+strategyconf=cfg/strategy.json
 pidfile=var/app.pid
 logfile=log/app.log
 
@@ -44,7 +45,7 @@ function start() {
         echo -n "[old process]still running, quit, pid = "
         cat $pidfile
     else
-        nohup ./$app -c $conf >>$logfile 2>&1 &
+        nohup ./$app -c $conf -s $strategyconf>>$logfile 2>&1 &
         echo $! > $pidfile
         echo "start ok, pid=$!"
     fi
