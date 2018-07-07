@@ -3,7 +3,6 @@
 tmpGodeps/
 .gitversion
 log-agent
-pkg/
 var/
 log/
 falcon-log-agent
