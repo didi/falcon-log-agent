@@ -43,7 +43,7 @@ The data model is similar to the data model in Open-Falcon: metric and endpoint 
 
 clone & build
 ```
-git clone https://github.com/didichuxing/falcon-log-agent.git && cd falcon-log-agent && sh build.sh
+git clone https://github.com/didi/falcon-log-agent.git && cd falcon-log-agent && sh build.sh
 ```
 change configs
 ```
