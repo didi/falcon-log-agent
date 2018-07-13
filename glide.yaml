@@ -1,4 +1,4 @@
-package: falcon-log-agent
+package: github.com/didi/falcon-log-agent
 import:
 - package: github.com/gin-gonic/gin
   version: ~1.2.0
