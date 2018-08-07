@@ -25,12 +25,16 @@ func (m *MetricTags) HasKey(k string) bool {
 }
 
 func (m *MetricTags) AddCount(k string, v int64) {
+	m.RLock()
 	if _, ok := m.Counters[k]; !ok {
+		m.RUnlock()
 		m.Lock()
 		if _, ok := m.Counters[k]; !ok {
 			m.Counters[k] = 0
 		}
 		m.Unlock()
+	} else {
+		m.RUnlock()
 	}
 	m.Counters[k] = m.Counters[k] + v
 }
