@@ -17,16 +17,7 @@ import (
 	"github.com/parnurzeal/gorequest"
 )
 
-type OdinPoint struct {
-	Name      string            `json:"name"`
-	Value     float64           `json:"value"`
-	Timestamp int64             `json:"timestamp"`
-	Tags      map[string]string `json:"tags"`
-	Step      int64             `json:"step"`
-	Offset    int64             `json:"offset"`
-	NS        []string          `json:"-"`
-}
-
+// FalconPoint to push to falcon-agent
 type FalconPoint struct {
 	Endpoint    string  `json:"endpoint"`
 	Metric      string  `json:"metric"`
@@ -37,6 +28,7 @@ type FalconPoint struct {
 	Tags        string  `json:"tags"`
 }
 
+// SortByTms to be used by sort
 type SortByTms []*FalconPoint
 
 func (p SortByTms) Len() int           { return len(p) }
@@ -50,12 +42,14 @@ func init() {
 	pushQueue = make(chan *FalconPoint, 1024*100)
 }
 
+// PusherStart to start push loop
 func PusherStart() {
 	PosterLoop() //归类，批量发送给odin-agent
 	PusherLoop() //计算，推送给发送队列
 }
 
-//循环推送，10s一次
+// PosterLoop to start post loop
+// 循环推送，10s一次
 func PosterLoop() {
 	dlog.Info("PosterLoop Start")
 	go func() {
@@ -84,6 +78,7 @@ func PosterLoop() {
 	}()
 }
 
+// PusherLoop to start push loop
 func PusherLoop() {
 	dlog.Info("PushLoop Start")
 	for {
@@ -125,11 +120,12 @@ func tmsNeedPush(tms int64, filePath string, step int64) bool {
 	return false
 }
 
+// ToPushQueue to push data to pusher queue
 // 这个参数是为了最大限度的对接
 // pointMap的key，是打平了的tagkv
 func ToPushQueue(strategy *scheme.Strategy, tms int64, pointMap map[string]*PointCounter) error {
 	for tagstring, PointCounter := range pointMap {
-		var value float64 = 0
+		var value float64
 		switch strategy.Func {
 		case "cnt":
 			value = float64(PointCounter.Count)
@@ -219,11 +215,10 @@ func postToFalconAgent(paramPoints []*FalconPoint) {
 		dlog.Errorf("Post to falcon agent Failed! [code:%d][body:%s]", resp.StatusCode, body)
 		metric.MetricPushCnt(num, false)
 		return
-	} else {
-		metric.MetricPushCnt(num, true)
-		dlog.Infof("Post to falcon agent success! [code:%d][body:%s]", resp.StatusCode, body)
-		return
 	}
+	metric.MetricPushCnt(num, true)
+	dlog.Infof("Post to falcon agent success! [code:%d][body:%s]", resp.StatusCode, body)
+	return
 }
 
 func getPrecision(num float64, degree int64) float64 {

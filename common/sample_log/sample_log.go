@@ -62,7 +62,7 @@ func (s *SampleLog) RemoveKey(logContent string) {
 func (s *SampleLog) Keys() []string {
 	ret := make([]string, 0)
 	s.RLock()
-	for k, _ := range s.Sample {
+	for k := range s.Sample {
 		ret = append(ret, k)
 	}
 	s.RUnlock()

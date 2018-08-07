@@ -7,10 +7,12 @@ import (
 	"time"
 )
 
+// GetNowPath to get now path
 func GetNowPath(path string) string {
 	return getLogPath(path, true)
 }
 
+// GetCurrentPath to get current path
 func GetCurrentPath(path string) string {
 	return getLogPath(path, false)
 }

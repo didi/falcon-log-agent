@@ -8,7 +8,7 @@ import (
 
 func TestCreatejobAndDeletejob(t *testing.T) {
 	config := &ConfigInfo{
-		Id:       1,
+		ID:       1,
 		FilePath: "/Users/anbaoyong/Project/test/aby.${%Y-%m-%d-%H}",
 	}
 	cache := make(chan string, 100)

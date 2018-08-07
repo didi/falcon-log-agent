@@ -13,18 +13,24 @@ import (
 	"github.com/didi/falcon-log-agent/strategy"
 )
 
+// ConfigInfo to control config
 type ConfigInfo struct {
-	Id       int64
+	ID       int64
 	FilePath string
 }
 
+// Job to control job
 type Job struct {
 	r *reader.Reader
 	w *WorkerGroup
 }
 
+// ManagerJob to manage jobs
 var ManagerJob map[string]*Job //管理job,文件路径为key
+// ManagerJobLock is a global lock
 var ManagerJobLock *sync.RWMutex
+
+// ManagerConfig to manage configs
 var ManagerConfig map[int64]*ConfigInfo
 
 func init() {
@@ -33,6 +39,7 @@ func init() {
 	ManagerConfig = make(map[int64]*ConfigInfo)
 }
 
+// UpdateConfigsLoop to update strategys
 func UpdateConfigsLoop() {
 	for {
 		strategy.Update()
@@ -41,19 +48,19 @@ func UpdateConfigsLoop() {
 
 		for id, st := range strategyMap {
 			config := &ConfigInfo{
-				Id:       id,
+				ID:       id,
 				FilePath: st.FilePath,
 			}
 			cache := make(chan string, g.Conf().Worker.QueueSize)
 			if err := createJob(config, cache, st); err != nil {
-				dlog.Errorf("create job fail [id:%d][filePath:%s][err:%v]", config.Id, config.FilePath, err)
+				dlog.Errorf("create job fail [id:%d][filePath:%s][err:%v]", config.ID, config.FilePath, err)
 			}
 		}
 
-		for id, _ := range ManagerConfig {
+		for id := range ManagerConfig {
 			if _, ok := strategyMap[id]; !ok { //如果策略中不存在，说明用户已删除
 				config := &ConfigInfo{
-					Id:       id,
+					ID:       id,
 					FilePath: ManagerConfig[id].FilePath,
 				}
 				deleteJob(config)
@@ -67,34 +74,35 @@ func UpdateConfigsLoop() {
 	}
 }
 
+// GetOldestTms to analysis the oldes tms
 func GetOldestTms(filepath string) (int64, bool) {
 	ManagerJobLock.RLock()
 	defer ManagerJobLock.RUnlock()
 	job, ok := ManagerJob[filepath]
 	if !ok {
 		return 0, false
-	} else {
-		tms, allFree := job.w.GetOldestTms()
-		nowTms := time.Now().Unix()
-		//如果worker全都空闲，且当前时间戳已经领先1min
-		//则将标记的时间戳设置为当前时间戳-1min
-		if allFree && nowTms-tms > 60 {
-			tms = nowTms - 60
-		}
-		return tms, true
 	}
+
+	tms, allFree := job.w.GetOldestTms()
+	nowTms := time.Now().Unix()
+	//如果worker全都空闲，且当前时间戳已经领先1min
+	//则将标记的时间戳设置为当前时间戳-1min
+	if allFree && nowTms-tms > 60 {
+		tms = nowTms - 60
+	}
+	return tms, true
 }
 
 //添加任务到管理map( managerjob managerconfig) 启动reader和worker
 func createJob(config *ConfigInfo, cache chan string, st *scheme.Strategy) error {
 	if _, ok := ManagerJob[config.FilePath]; ok {
-		if _, ok := ManagerConfig[config.Id]; !ok {
-			ManagerConfig[config.Id] = config
+		if _, ok := ManagerConfig[config.ID]; !ok {
+			ManagerConfig[config.ID] = config
 		}
 		return nil
 	}
 
-	ManagerConfig[config.Id] = config
+	ManagerConfig[config.ID] = config
 	//启动reader
 	r, err := reader.NewReader(config.FilePath, cache)
 	if err != nil {
@@ -111,7 +119,7 @@ func createJob(config *ConfigInfo, cache chan string, st *scheme.Strategy) error
 	//启动reader
 	go r.Start()
 
-	dlog.Infof("Create job success [filePath:%s][sid:%d]", config.FilePath, config.Id)
+	dlog.Infof("Create job success [filePath:%s][sid:%d]", config.FilePath, config.ID)
 	return nil
 }
 
@@ -132,10 +140,10 @@ func deleteJob(config *ConfigInfo) {
 			delete(ManagerJob, config.FilePath)
 		}
 	}
-	dlog.Infof("Stop reader & worker success [filePath:%s][sid:%d]", config.FilePath, config.Id)
+	dlog.Infof("Stop reader & worker success [filePath:%s][sid:%d]", config.FilePath, config.ID)
 
 	//删除config
-	if _, ok := ManagerConfig[config.Id]; ok {
-		delete(ManagerConfig, config.Id)
+	if _, ok := ManagerConfig[config.ID]; ok {
+		delete(ManagerConfig, config.ID)
 	}
 }

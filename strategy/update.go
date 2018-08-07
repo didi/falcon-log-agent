@@ -11,26 +11,23 @@ import (
 	"time"
 )
 
-const PATTERN_EXCLUDE_PARTITION = "```EXCLUDE```"
+// PatternExcludePartition to separate pattern and exclude
+const PatternExcludePartition = "```EXCLUDE```"
 
-type TreeResponse struct {
-	Hostname string   `json:"hostname"`
-	NsList   []string `json:"nsList"`
-}
-
+// Update to update strategy
 func Update() error {
 	markTms := time.Now().Unix()
 	dlog.Infof("[%d]Update Strategy start", markTms)
 	strategys, err := getFileStrategy()
 	parsePattern(strategys)
 	updateRegs(strategys)
-	//updateOOMPath(strategys)
+
 	if err != nil {
 		dlog.Errorf("[%d]Get my Strategy error ! [msg:%v]", markTms, err)
 		return err
-	} else {
-		dlog.Infof("[%d]Get my Strategy success, num : [%d]", markTms, len(strategys))
 	}
+	dlog.Infof("[%d]Get my Strategy success, num : [%d]", markTms, len(strategys))
+
 	err = UpdateGlobalStrategy(strategys)
 	if err != nil {
 		dlog.Errorf("[%d]Update Strategy cache error ! [msg:%v]", err)
@@ -42,7 +39,7 @@ func Update() error {
 
 func parsePattern(strategys []*scheme.Strategy) {
 	for _, st := range strategys {
-		patList := strings.Split(st.Pattern, PATTERN_EXCLUDE_PARTITION)
+		patList := strings.Split(st.Pattern, PatternExcludePartition)
 
 		if len(patList) == 1 {
 			st.Pattern = strings.TrimSpace(st.Pattern)
