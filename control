@@ -12,22 +12,6 @@ logfile=log/app.log
 mkdir -p var &>/dev/null
 mkdir -p log &>/dev/null
 
-function install() {
-    stop_old
-    for i in `seq 1 10`
-    do
-    pidof log-analysis | grep -q '[0-9]'  || echo 'old log-analysis stop success'; return 0
-    stop_old
-    sleep 1
-    done
-    echo 'install error'
-}
-
-function stop_old() {
-    /usr/local/sbin/monit stop log-analysis 
-    monit stop log-analysis
-}
-
 function stop_pid() {
     pid=$(cat $pidfile)
     # 校验pid与进程名是否一致  || 根据进程名获取pid，要求父进程ppid==1(适用于root启动的agent)
@@ -74,12 +58,6 @@ function stop() {
     done
 }
 
-function shutdown() {
-    pid=`get_pid`
-    kill -9 $pid
-    echo "stoped"
-}
-
 function restart() {
     stop
     sleep 1
@@ -120,17 +98,11 @@ function check_pid() {
 
 action=$1
 case $action in
-    "install" )
-        install
-        ;;
     "start" )
         start
         ;;
     "stop" )
         stop
-        ;;
-    "kill" )
-        shutdown
         ;;
     "restart" )
         restart

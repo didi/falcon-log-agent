@@ -1,15 +1,17 @@
 package main
 
 import (
-	"common/dlog"
-	"common/g"
-	"common/proc/metric"
-	"common/proc/patrol"
-	"common/utils"
-	"http"
+	"github.com/didi/falcon-log-agent/http"
+
+	"github.com/didi/falcon-log-agent/common/proc/metric"
+	"github.com/didi/falcon-log-agent/common/proc/patrol"
+	"github.com/didi/falcon-log-agent/common/utils"
+
+	"github.com/didi/falcon-log-agent/common/dlog"
+	"github.com/didi/falcon-log-agent/common/g"
+	"github.com/didi/falcon-log-agent/worker"
 
 	"runtime"
-	"worker"
 )
 
 func main() {
