@@ -36,7 +36,6 @@ function start() {
 }
 
 function stop() {
-    stop_old
     kill `get_pid`
     for i in `seq 1 20`
     do
