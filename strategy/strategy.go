@@ -17,6 +17,7 @@ func init() {
 	globalStrategy = make(map[int64]*scheme.Strategy, 0)
 }
 
+// UpdateGlobalStrategy to update strategy
 func UpdateGlobalStrategy(sts []*scheme.Strategy) error {
 	tmpStrategyMap := make(map[int64]*scheme.Strategy, 0)
 	for _, st := range sts {
@@ -29,6 +30,7 @@ func UpdateGlobalStrategy(sts []*scheme.Strategy) error {
 	return nil
 }
 
+// GetListAll to get all strategy
 func GetListAll() []*scheme.Strategy {
 	stmap := GetDeepCopyAll()
 	var ret []*scheme.Strategy
@@ -38,6 +40,7 @@ func GetListAll() []*scheme.Strategy {
 	return ret
 }
 
+// GetDeepCopyAll to get all strategy deep copy
 func GetDeepCopyAll() map[int64]*scheme.Strategy {
 	ret := make(map[int64]*scheme.Strategy, len(globalStrategy))
 	for k, v := range globalStrategy {
@@ -46,15 +49,17 @@ func GetDeepCopyAll() map[int64]*scheme.Strategy {
 	return ret
 }
 
+// GetAll to get all strategy
 func GetAll() map[int64]*scheme.Strategy {
 	return globalStrategy
 }
 
+// GetByID to get strategy by id
 func GetByID(id int64) (*scheme.Strategy, error) {
 	st, ok := globalStrategy[id]
 
 	if !ok {
-		return nil, fmt.Errorf("ID : %d is not exists in global Cache")
+		return nil, fmt.Errorf("ID : %d is not exists in global Cache", id)
 	}
 	return st, nil
 

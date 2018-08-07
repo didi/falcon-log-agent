@@ -11,7 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HttpStart() {
+// Start http api
+func Start() {
 	router := gin.Default()
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "ok")

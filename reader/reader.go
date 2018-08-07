@@ -9,6 +9,7 @@ import (
 	"github.com/hpcloud/tail"
 )
 
+// Reader to read file
 type Reader struct {
 	FilePath    string //配置的路径 正则路径
 	t           *tail.Tail
@@ -17,6 +18,7 @@ type Reader struct {
 	Close       chan struct{}
 }
 
+// NewReader to create a reader
 func NewReader(filepath string, stream chan string) (*Reader, error) {
 	r := &Reader{
 		FilePath: filepath,
@@ -50,6 +52,7 @@ func (r *Reader) openFile(whence int, filepath string) error {
 	return nil
 }
 
+// StartRead to start to read
 func (r *Reader) StartRead() {
 	var readCnt, readSwp int64
 	var dropCnt, dropSwp int64
@@ -89,15 +92,19 @@ func (r *Reader) StartRead() {
 	analysClose <- 0
 }
 
+// StopRead to stop a read instance
 func (r *Reader) StopRead() error {
 	return r.t.Stop()
 }
 
+// Stop to stop a reader
 func (r *Reader) Stop() {
 	r.StopRead()
 	close(r.Close)
 
 }
+
+// Start a reader
 func (r *Reader) Start() {
 	go r.StartRead()
 	for {
@@ -111,6 +118,7 @@ func (r *Reader) Start() {
 	}
 
 }
+
 func (r *Reader) check() {
 	nextpath := GetNowPath(r.FilePath)
 	if r.CurrentPath != nextpath {

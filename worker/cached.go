@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// cached时间周期
-const CACHED_DURATION = 60
+// CachedDuration cached时间周期
+const CachedDuration = 60
 
 type counterCache struct {
 	sync.RWMutex
@@ -26,18 +26,20 @@ func init() {
 	go CleanLoop()
 }
 
-func (this *counterCache) AddPoint(tms int64, value float64) {
-	this.Lock()
-	this.Points[tms] = value
-	this.Unlock()
+func (c *counterCache) AddPoint(tms int64, value float64) {
+	c.Lock()
+	c.Points[tms] = value
+	c.Unlock()
 }
 
+// PostToCache to post points to cache
 func PostToCache(paramPoints []*FalconPoint) {
 	for _, point := range paramPoints {
 		globalPushPoints.AddPoint(point)
 	}
 }
 
+// CleanLoop to Loop & clean old cache
 func CleanLoop() {
 	for {
 		// 遍历，删掉过期的cache
@@ -46,6 +48,7 @@ func CleanLoop() {
 	}
 }
 
+// GetCachedAll to get all cache
 func GetCachedAll() string {
 	globalPushPoints.Lock()
 	str, _ := json.Marshal(globalPushPoints)
@@ -53,67 +56,75 @@ func GetCachedAll() string {
 	return string(str)
 }
 
-func (this *counterCache) GetKeys() []int64 {
-	this.RLock()
+// GetKeys
+func (c *counterCache) GetKeys() []int64 {
+	c.RLock()
 	retList := make([]int64, 0)
-	for k, _ := range this.Points {
+	for k := range c.Points {
 		retList = append(retList, k)
 	}
-	this.RUnlock()
+	c.RUnlock()
 	return retList
 }
 
-func (this *counterCache) RemoveTms(tms int64) {
-	this.Lock()
-	delete(this.Points, tms)
-	this.Unlock()
+// RemoveTms
+func (c *counterCache) RemoveTms(tms int64) {
+	c.Lock()
+	delete(c.Points, tms)
+	c.Unlock()
 }
 
-func (this *pushPointsCache) AddCounter(counter string) {
-	this.Lock()
+// AddCounter
+func (pc *pushPointsCache) AddCounter(counter string) {
+	pc.Lock()
 	tmp := new(counterCache)
 	tmp.Points = make(map[int64]float64, 0)
-	this.Counters[counter] = tmp
-	this.Unlock()
+	pc.Counters[counter] = tmp
+	pc.Unlock()
 }
 
-func (this *pushPointsCache) GetCounters() []string {
+// GetCounters
+func (pc *pushPointsCache) GetCounters() []string {
 	ret := make([]string, 0)
-	this.RLock()
-	for k, _ := range this.Counters {
+	pc.RLock()
+	for k := range pc.Counters {
 		ret = append(ret, k)
 	}
-	this.RUnlock()
+	pc.RUnlock()
 	return ret
 }
 
-func (this *pushPointsCache) RemoveCounter(counter string) {
-	this.Lock()
-	delete(this.Counters, counter)
-	this.Unlock()
+// RemoveCounter
+func (pc *pushPointsCache) RemoveCounter(counter string) {
+	pc.Lock()
+	delete(pc.Counters, counter)
+	pc.Unlock()
 }
 
-func (this *pushPointsCache) GetCounterObj(key string) (*counterCache, bool) {
-	this.RLock()
-	Points, ok := this.Counters[key]
-	this.RUnlock()
+// GetCounterObj
+func (pc *pushPointsCache) GetCounterObj(key string) (*counterCache, bool) {
+	pc.RLock()
+	Points, ok := pc.Counters[key]
+	pc.RUnlock()
 
 	return Points, ok
 }
 
-func (this *pushPointsCache) AddPoint(point *FalconPoint) {
+// AddPoint
+func (pc *pushPointsCache) AddPoint(point *FalconPoint) {
 	counter := calcCounter(point)
-	if _, ok := this.GetCounterObj(counter); !ok {
-		this.AddCounter(counter)
+	if _, ok := pc.GetCounterObj(counter); !ok {
+		pc.AddCounter(counter)
 	}
-	counterPoints, _ := this.GetCounterObj(counter)
+	counterPoints, _ := pc.GetCounterObj(counter)
 	counterPoints.AddPoint(point.Timestamp, point.Value)
 }
 
-func (this *pushPointsCache) CleanOld() {
-	counters := this.GetCounters()
+// CleanOld
+func (pc *pushPointsCache) CleanOld() {
+	counters := pc.GetCounters()
 	for _, counter := range counters {
-		counterObj, exists := this.GetCounterObj(counter)
+		counterObj, exists := pc.GetCounterObj(counter)
 		if !exists {
 			continue
 		}
@@ -121,10 +132,10 @@ func (this *pushPointsCache) CleanOld() {
 
 		//如果列表为空，清理掉这个counter
 		if len(tmsList) == 0 {
-			this.RemoveCounter(counter)
+			pc.RemoveCounter(counter)
 		} else {
 			for _, tms := range tmsList {
-				if (time.Now().Unix() - tms) > CACHED_DURATION {
+				if (time.Now().Unix() - tms) > CachedDuration {
 					counterObj.RemoveTms(tms)
 				}
 			}

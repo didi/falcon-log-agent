@@ -27,5 +27,5 @@ func main() {
 	go patrol.PatrolLoop()
 	go worker.PusherStart()
 
-	http.HttpStart()
+	http.Start()
 }

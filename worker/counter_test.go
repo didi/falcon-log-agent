@@ -19,7 +19,6 @@ func TestCounterStart(a *testing.T) {
 		}
 		time.Sleep(1 * time.Second)
 	}
-	time.Sleep(20 * time.Second)
 }
 
 func TestPushToCount(a *testing.T) {
@@ -60,7 +59,7 @@ func mockupsStrategy() *scheme.StrategyCache {
 	return &scheme.StrategyCache{
 		Updated: time.Now().Unix(),
 		Strategys: map[int64]*scheme.Strategy{
-			1: &scheme.Strategy{
+			1: {
 				ID:              1,
 				Name:            "alarmer.not.found.conf",
 				FilePath:        "/tmp/memeda.log",

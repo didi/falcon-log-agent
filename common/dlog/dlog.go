@@ -423,6 +423,6 @@ func Printf(format string, args ...interface{}) {
 	logging.printfSimple(format, args...)
 }
 
-func GetLogger() *Logger{
+func GetLogger() *Logger {
 	return &logging
 }

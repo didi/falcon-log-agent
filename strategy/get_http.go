@@ -45,13 +45,10 @@ func getRequest(url string, timeout int) (string, error) {
 		if resp.StatusCode != 200 {
 			dlog.Errorf("get HTTP Request Response: [code:%d][body:%s][errs:%v]", resp.StatusCode, body, errs)
 			return body, fmt.Errorf("Code is not 200")
-		} else {
-			//err == nil  && code == 200
-			dlog.Infof("get HTTP Request Response : [code:%d][body:%s]", 200, body)
-			return body, nil
 		}
-	} else {
-		dlog.Errorf("get HTTP Request Response: [body:%s][errs:%v]", body, errs)
-		return body, fmt.Errorf("%v", errs)
+		dlog.Infof("get HTTP Request Response : [code:%d][body:%s]", 200, body)
+		return body, nil
 	}
+	dlog.Errorf("get HTTP Request Response: [body:%s][errs:%v]", body, errs)
+	return body, fmt.Errorf("%v", errs)
 }

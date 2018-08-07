@@ -1,7 +1,6 @@
 package worker
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"regexp"
@@ -18,7 +17,8 @@ import (
 	"github.com/didi/falcon-log-agent/common/utils"
 )
 
-//单个worker对象
+// Worker to analysis
+// 单个worker对象
 type Worker struct {
 	FilePath  string
 	Counter   int64
@@ -29,7 +29,8 @@ type Worker struct {
 	Analyzing bool   //标记当前Worker状态是否在分析中,还是空闲状态
 }
 
-//worker组
+// WorkerGroup is group of workers
+// worker组
 type WorkerGroup struct {
 	WorkerNum          int
 	LatestTms          int64 //保留字段
@@ -37,12 +38,13 @@ type WorkerGroup struct {
 	TimeFormatStrategy string
 }
 
-func (this WorkerGroup) GetOldestTms() (tms int64, allFree bool) {
+// GetOldestTms to get oldest tms
+func (wg WorkerGroup) GetOldestTms() (tms int64, allFree bool) {
 	allFree = true
 	var analysingOldestTms int64
 	var freeNewestTms int64
 
-	for _, w := range this.Workers {
+	for _, w := range wg.Workers {
 		if w.LatestTms > freeNewestTms {
 			freeNewestTms = w.LatestTms
 		}
@@ -66,9 +68,8 @@ func (this WorkerGroup) GetOldestTms() (tms int64, allFree bool) {
 	return tms, allFree
 }
 
-/*
- * filepath和stream依赖外部，其他的都自己创建
- */
+// NewWorkerGroup to new a worker group
+// filepath和stream依赖外部，其他的都自己创建
 func NewWorkerGroup(filePath string, stream chan string, st *scheme.Strategy) *WorkerGroup {
 
 	wg := &WorkerGroup{
@@ -94,28 +95,33 @@ func NewWorkerGroup(filePath string, stream chan string, st *scheme.Strategy) *W
 	return wg
 }
 
+// Start to start a workergroup
 func (wg *WorkerGroup) Start() {
 	for _, worker := range wg.Workers {
 		worker.Start()
 	}
 }
 
+// Stop to stop a workergroup
 func (wg *WorkerGroup) Stop() {
 	for _, worker := range wg.Workers {
 		worker.Stop()
 	}
 }
 
+// Start to start a worker
 func (w *Worker) Start() {
 	go func() {
 		w.Work()
 	}()
 }
 
+// Stop to stop a worker
 func (w *Worker) Stop() {
 	close(w.Close)
 }
 
+// Work to analysis logs
 func (w *Worker) Work() {
 	defer func() {
 		if reason := recover(); reason != nil {
@@ -201,7 +207,7 @@ func (w *Worker) producer(line string, strategy *scheme.Strategy) (*AnalysPoint,
 
 	t := reg.FindString(line)
 	if len(t) <= 0 {
-		return nil, errors.New(fmt.Sprintf("cannot get timestamp:[sname:%s][sid:%d][timeFormat:%v]", strategy.Name, strategy.ID, timeFormat))
+		return nil, fmt.Errorf("cannot get timestamp:[sname:%s][sid:%d][timeFormat:%v]", strategy.Name, strategy.ID, timeFormat)
 	}
 
 	// 如果没有年，需添加当前年
