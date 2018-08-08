@@ -2,6 +2,10 @@
 
 ![log-agent](./pic/logo.png)
 
+[![Build Status](https://img.shields.io/github/stars/didi/falcon-log-agent.svg)](https://github.com/didi/falcon-log-agent)
+[![Build Status](https://img.shields.io/github/forks/didi/falcon-log-agent.svg)](https://github.com/didi/falcon-log-agent)
+[![Build Status](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/didi/falcon-log-agent)
+
 # 目录
 - [简介](#简介)
 - [Feature](#Feature)
