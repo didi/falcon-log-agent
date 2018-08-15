@@ -15,26 +15,21 @@ type MetricTags struct {
 
 func (m *MetricTags) HasKey(k string) bool {
 	m.RLock()
+	defer m.RUnlock()
 	if _, ok := m.Counters[k]; ok {
-		m.RUnlock()
 		return true
 	} else {
-		m.RUnlock()
 		return false
 	}
 }
 
 func (m *MetricTags) AddCount(k string, v int64) {
-	m.RLock()
+	m.Lock()
+	defer m.Unlock()
 	if _, ok := m.Counters[k]; !ok {
-		m.RUnlock()
-		m.Lock()
 		if _, ok := m.Counters[k]; !ok {
 			m.Counters[k] = 0
 		}
-		m.Unlock()
-	} else {
-		m.RUnlock()
 	}
 	m.Counters[k] = m.Counters[k] + v
 }
