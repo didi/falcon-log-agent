@@ -25,5 +25,11 @@ func Start() {
 		c.String(http.StatusOK, worker.GetCachedAll())
 	})
 
+	router.POST("/check", func(c *gin.Context) {
+		log := c.PostForm("log")
+		fmt.Println(log)
+		c.JSON(http.StatusOK, CheckLogByStrategy(log))
+	})
+
 	router.Run(fmt.Sprintf("0.0.0.0:%d", g.Conf().Http.HTTPPort))
 }
