@@ -3,8 +3,6 @@ package http
 import (
 	"regexp"
 
-	"fmt"
-
 	"github.com/didi/falcon-log-agent/common/scheme"
 	"github.com/didi/falcon-log-agent/common/utils"
 	"github.com/didi/falcon-log-agent/strategy"
@@ -54,7 +52,6 @@ func matchedStrategy(content string, strategy *scheme.Strategy) (bool, map[strin
 			return false, map[string]string{}
 		}
 		l := reg.FindStringSubmatch(content)
-		fmt.Println(key, l, pat, content)
 		if len(l) == 0 {
 			if key != "exclude_" {
 				return false, map[string]string{}

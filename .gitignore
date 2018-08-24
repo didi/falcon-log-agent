@@ -5,6 +5,7 @@ tmpGodeps/
 log-agent
 var/
 log/
+logs/
 falcon-log-agent
 output/
 .idea/*

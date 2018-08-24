@@ -27,7 +27,6 @@ func Start() {
 
 	router.POST("/check", func(c *gin.Context) {
 		log := c.PostForm("log")
-		fmt.Println(log)
 		c.JSON(http.StatusOK, CheckLogByStrategy(log))
 	})
 
