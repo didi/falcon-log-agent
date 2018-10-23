@@ -282,7 +282,7 @@ falcon-log-agent本身对外提供了一个http服务用来暴露自身状态。
 
 
 # 自监控
-在[common/proc/metric/metric.go](https://github.com/didi/falcon-log-agent/blob/master/src/common/proc/metric/metric.go#L39)定义了一个自监控结构体。
+在[common/proc/metric/metric.go](https://github.com/didi/falcon-log-agent/blob/master/common/proc/metric/metric.go#L38)定义了一个自监控结构体。
 
 在程序运行过程中会不断收集信息，主要包括如下：
 ```
@@ -297,4 +297,4 @@ PushLatency     推送监控数据延迟
 ```
 这些数据，目前自监控的处理方式是：定时输出日志。
 
-如果需要对接自己公司的监控系统，在[common/proc/metric/metric.go](https://github.com/didi/falcon-log-agent/blob/master/src/common/proc/metric/metric.go#L82)修改HandleMetrics方法即可。
+如果需要对接自己公司的监控系统，在[common/proc/metric/metric.go](https://github.com/didi/falcon-log-agent/blob/master/common/proc/metric/metric.go#L81)修改HandleMetrics方法即可。
