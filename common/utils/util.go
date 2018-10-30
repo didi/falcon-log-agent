@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+	"net"
 	"os"
 	"strings"
 
@@ -14,6 +16,40 @@ func LocalHostname() (string, error) {
 	}
 	h = strings.TrimSuffix(h, ".diditaxi.com")
 	return h, nil
+}
+
+func LocalIP() (string, error) {
+	addrs, err := net.InterfaceAddrs()
+
+	if err != nil {
+		return "", err
+	}
+
+	for _, address := range addrs {
+		// 检查ip地址判断是否回环地址
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String(), nil
+			}
+
+		}
+	}
+
+	return "", fmt.Errorf("cannot get local ip address")
+}
+
+func GetEndpoint(endpoint string) (string, error) {
+	if strings.ToUpper(endpoint) == "IP" {
+		return LocalIP()
+	}
+
+	if strings.ToUpper(endpoint) == "HOST" {
+		return LocalHostname()
+	}
+
+	// endpoint默认使用主机名
+	return LocalHostname()
+
 }
 
 //根据配置的时间格式，获取对应的正则匹配pattern和time包用的时间格式

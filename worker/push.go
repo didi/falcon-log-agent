@@ -155,7 +155,7 @@ func ToPushQueue(strategy *scheme.Strategy, tms int64, pointMap map[string]*Poin
 			tags = utils.DictedTagstring(tagstring)
 		}
 
-		hostname, err := utils.LocalHostname()
+		hostname, err := utils.GetEndpoint(g.Conf().Endpoint)
 		if err != nil {
 			dlog.Errorf("cannot get hostname : %v", err)
 			return err

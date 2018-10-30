@@ -39,6 +39,7 @@ type Config struct {
 	Http       httpConfig   `json:"http"`
 	Strategy   loadConfig   `json:"strategy"`
 	Worker     workerConfig `json:"worker"`
+	Endpoint   string       `json:"endpoint"`
 	MaxCPURate float64      `json:"max_cpu_rate"`
 	MaxCPUNum  int          `json:"max_cpu_num"`
 	MaxMemRate float64      `json:"max_mem_rate"`

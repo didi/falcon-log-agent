@@ -135,6 +135,7 @@ default_degree:默认的采集精度
 **其他**
 ```
 http_port:自身状态对外暴露的接口
+endpoint:上报至open-falcon的endpoint配置。(可选host或ip,host为主机名,ip为本机ip)
 ```
 
 # 采集策略
