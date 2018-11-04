@@ -18,7 +18,7 @@ const PatternExcludePartition = "```EXCLUDE```"
 func Update() error {
 	markTms := time.Now().Unix()
 	dlog.Infof("[%d]Update Strategy start", markTms)
-	strategys, err := getFileStrategy()
+	strategys, err := GetAllStrategies()
 	parsePattern(strategys)
 	updateRegs(strategys)
 
