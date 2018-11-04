@@ -12,3 +12,4 @@ output/
 cfg/dev.test.cfg
 cfg/strategy.test.json
 falcon-log-agent.tar.gz
+cfg/strategies/
