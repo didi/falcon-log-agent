@@ -123,7 +123,7 @@ push_url：推送的odin-agent的url
 **资源限制**
 ```
 max_cpu_rate:最大使用的cpu百分比。（可用核数=ceil(总核数*max_cpu_rate))
-max_mem_rate:最打使用内存百分比。(最大内存=(内存总大小*max_mem_rate)，最小为500M)
+max_mem_rate:最大使用内存百分比。(最大内存=(内存总大小*max_mem_rate)，最小为500M)
 ```
 
 **策略相关**
