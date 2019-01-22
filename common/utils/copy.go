@@ -14,6 +14,7 @@ func DeepCopyStrategy(ori *scheme.Strategy) *scheme.Strategy {
 		Func:       ori.Func,
 		Degree:     ori.Degree,
 		Comment:    ori.Comment,
+		ParseSucc:  ori.ParseSucc,
 	}
 	return ret
 }
