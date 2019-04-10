@@ -299,3 +299,10 @@ PushLatency     推送监控数据延迟
 这些数据，目前自监控的处理方式是：定时输出日志。
 
 如果需要对接自己公司的监控系统，在[common/proc/metric/metric.go](https://github.com/didi/falcon-log-agent/blob/master/common/proc/metric/metric.go#L81)修改HandleMetrics方法即可。
+
+# 贡献者
+- [**高家升**](https://github.com/GaoJiasheng)
+- [**安宝勇**](https://github.com/anbaoyong)
+- [wcc526](https://github.com/wcc526)
+- [mdh67899](https://github.com/mdh67899)
+- [1Feng](https://github.com/1Feng)
