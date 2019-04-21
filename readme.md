@@ -5,6 +5,8 @@
 [![Build Status](https://img.shields.io/github/stars/didi/falcon-log-agent.svg)](https://github.com/didi/falcon-log-agent)
 [![Build Status](https://img.shields.io/github/forks/didi/falcon-log-agent.svg)](https://github.com/didi/falcon-log-agent)
 [![Build Status](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/didi/falcon-log-agent)
+[![Backers on Open Collective](https://opencollective.com/falcon-log-agent/backers/badge.svg)](#backers) 
+[![Sponsors on Open Collective](https://opencollective.com/falcon-log-agent/sponsors/badge.svg)](#sponsors) 
 
 # 目录
 - [简介](#简介)
@@ -306,3 +308,32 @@ PushLatency     推送监控数据延迟
 - [wcc526](https://github.com/wcc526)
 - [mdh67899](https://github.com/mdh67899)
 - [1Feng](https://github.com/1Feng)
+
+
+## Contributors
+
+This project exists thanks to all the people who contribute. 
+<a href="https://github.com/didi/falcon-log-agent/graphs/contributors"><img src="https://opencollective.com/falcon-log-agent/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/falcon-log-agent#backer)]
+
+<a href="https://opencollective.com/falcon-log-agent#backers" target="_blank"><img src="https://opencollective.com/falcon-log-agent/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/falcon-log-agent#sponsor)]
+
+<a href="https://opencollective.com/falcon-log-agent/sponsor/0/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/1/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/2/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/3/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/4/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/5/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/6/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/7/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/8/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/falcon-log-agent/sponsor/9/website" target="_blank"><img src="https://opencollective.com/falcon-log-agent/sponsor/9/avatar.svg"></a>
