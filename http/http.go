@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/didi/falcon-log-agent/common/utils"
+
 	"github.com/didi/falcon-log-agent/common/g"
 	"github.com/didi/falcon-log-agent/strategy"
 	"github.com/didi/falcon-log-agent/worker"
@@ -30,5 +32,9 @@ func Start() {
 		c.JSON(http.StatusOK, CheckLogByStrategy(log))
 	})
 
-	router.Run(fmt.Sprintf("0.0.0.0:%d", g.Conf().Http.HTTPPort))
+	ip, err := utils.LocalIP()
+	if err != nil {
+		ip = "127.0.0.1"
+	}
+	router.Run(fmt.Sprintf("%s:%d", ip, g.Conf().Http.HTTPPort))
 }
