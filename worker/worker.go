@@ -5,6 +5,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/didi/falcon-log-agent/strategy"
@@ -17,55 +18,55 @@ import (
 	"github.com/didi/falcon-log-agent/common/utils"
 )
 
+type callbackHandler func(int64, int64)
+
 // Worker to analysis
 // 单个worker对象
 type Worker struct {
 	FilePath  string
 	Counter   int64
 	LatestTms int64 //正在处理的单条日志时间
+	Delay     int64 //时间戳乱序差值, 每个worker独立更新
 	Close     chan struct{}
 	Stream    chan string
 	Mark      string //标记该worker信息，方便打log及上报自监控指标, 追查问题
 	Analyzing bool   //标记当前Worker状态是否在分析中,还是空闲状态
+	Callback  callbackHandler
 }
 
 // WorkerGroup is group of workers
 // worker组
 type WorkerGroup struct {
 	WorkerNum          int
-	LatestTms          int64 //保留字段
+	LatestTms          int64 //日志文件最新处理的时间戳
+	MaxDelay           int64 //日志文件存在的时间戳乱序最大差值
+	ResetTms           int64 //maxDelay上次重置的时间
 	Workers            []*Worker
 	TimeFormatStrategy string
 }
 
-// GetOldestTms to get oldest tms
-func (wg WorkerGroup) GetOldestTms() (tms int64, allFree bool) {
-	allFree = true
-	var analysingOldestTms int64
-	var freeNewestTms int64
+func (wg WorkerGroup) GetLatestTmsAndDelay() (tms int64, delay int64) {
+	return wg.LatestTms, wg.MaxDelay
+}
 
-	for _, w := range wg.Workers {
-		if w.LatestTms > freeNewestTms {
-			freeNewestTms = w.LatestTms
-		}
+func (wg *WorkerGroup) SetLatestTmsAndDelay(tms int64, delay int64) {
+	latest := atomic.LoadInt64(&wg.LatestTms)
 
-		if w.LatestTms >= 0 && w.Analyzing == true {
-			allFree = false
-			if analysingOldestTms == 0 {
-				analysingOldestTms = w.LatestTms
-			} else if analysingOldestTms > w.LatestTms {
-				analysingOldestTms = w.LatestTms
-			}
+	if latest < tms {
+		swapped := atomic.CompareAndSwapInt64(&wg.LatestTms, latest, tms)
+		if swapped {
+			dlog.Debugf("[work group:%s][set latestTms:%d]", wg.Workers[0].Mark, tms)
 		}
 	}
 
-	if allFree {
-		tms = freeNewestTms
-	} else {
-		tms = analysingOldestTms
+	if delay == 0 {
+		return
 	}
 
-	return tms, allFree
+	newest := atomic.LoadInt64(&wg.MaxDelay)
+	if newest < delay {
+		atomic.CompareAndSwapInt64(&wg.MaxDelay, newest, delay)
+	}
 }
 
 // NewWorkerGroup to new a worker group
@@ -89,6 +90,9 @@ func NewWorkerGroup(filePath string, stream chan string, st *scheme.Strategy) *W
 		w.Mark = mark
 		w.Analyzing = false
 		w.Counter = 0
+		w.LatestTms = 0
+		w.Delay = 0
+		w.Callback = wg.SetLatestTmsAndDelay
 		wg.Workers = append(wg.Workers, &w)
 	}
 
@@ -106,6 +110,16 @@ func (wg *WorkerGroup) Start() {
 func (wg *WorkerGroup) Stop() {
 	for _, worker := range wg.Workers {
 		worker.Stop()
+	}
+}
+
+// ResetMaxDelay reset maxDelay record
+func (wg *WorkerGroup) ResetMaxDelay() {
+	// reset every day, hard code
+	ts := time.Now().Unix()
+	if ts-wg.ResetTms > 86400 {
+		wg.ResetTms = ts
+		atomic.StoreInt64(&wg.MaxDelay, 0)
 	}
 }
 
@@ -226,8 +240,32 @@ func (w *Worker) producer(line string, strategy *scheme.Strategy) (*AnalysPoint,
 	if err != nil {
 		return nil, err
 	}
-	//
-	w.LatestTms = tms.Unix()
+
+	tmsUnix := tms.Unix()
+	// 日志时间戳大于机器时间, 直接丢弃, 脏数据影响 latestTms 对推点的逻辑判断
+	if tmsUnix > time.Now().Unix() {
+		dlog.Debugf("%s[illegal timestamp][id:%d][tmsUnix:%d][current:%d]",
+			w.Mark, strategy.ID, tmsUnix, time.Now().Unix())
+		return nil, fmt.Errorf("illegal timestamp, greater than current")
+	}
+
+	// 更新worker的时间戳和乱序差值
+	// 如有必要, 更新上层group的时间戳和乱序差值
+	updateLatest := false
+	delay := int64(0)
+	if w.LatestTms < tmsUnix {
+		updateLatest = true
+		w.LatestTms = tmsUnix
+
+	} else if w.LatestTms > tmsUnix {
+		dlog.Debugf("%s[timestamp disorder][id:%d][latest:%d][producing:%d]",
+			w.Mark, strategy.ID, w.LatestTms, tmsUnix)
+
+		delay = w.LatestTms - tmsUnix
+	}
+	if updateLatest || delay > 0 {
+		w.Callback(tmsUnix, delay)
+	}
 
 	//处理用户正则
 	var patternReg, excludeReg *regexp.Regexp

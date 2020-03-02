@@ -110,13 +110,34 @@ func PusherLoop() {
 }
 
 func tmsNeedPush(tms int64, filePath string, step int64) bool {
-	readerOldestTms, exists := GetOldestTms(filePath)
-	if !exists {
+	// workerGroup的latestTms代表当前读取到的最新时间窗口
+	// 如果日志时间戳没有乱序, 那么小于该窗口的点都可以push
+	latest, delay, found := GetLatestTmsAndDelay(filePath)
+
+	if !found {
 		return true
 	}
-	if tms < AlignStepTms(step, readerOldestTms) {
+
+	// 为解决日志时间戳乱序的最大等待时间, hard code
+	// delay == 0时, 不用额外等待, 进而提高时效性
+	if delay > 0 {
+		var maxDelay int64
+		if step <= 10 {
+			maxDelay = step * 3
+		} else if step > 10 && step <= 30 {
+			maxDelay = step * 2
+		} else {
+			maxDelay = step
+		}
+		if delay > maxDelay {
+			delay = maxDelay
+		}
+	}
+
+	if tms < AlignStepTms(step, latest-delay) {
 		return true
 	}
+
 	return false
 }
 

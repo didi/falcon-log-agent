@@ -74,23 +74,16 @@ func UpdateConfigsLoop() {
 	}
 }
 
-// GetOldestTms to analysis the oldes tms
-func GetOldestTms(filepath string) (int64, bool) {
+func GetLatestTmsAndDelay(filepath string) (int64, int64, bool) {
 	ManagerJobLock.RLock()
-	defer ManagerJobLock.RUnlock()
 	job, ok := ManagerJob[filepath]
-	if !ok {
-		return 0, false
-	}
+	ManagerJobLock.RUnlock()
 
-	tms, allFree := job.w.GetOldestTms()
-	nowTms := time.Now().Unix()
-	//如果worker全都空闲，且当前时间戳已经领先1min
-	//则将标记的时间戳设置为当前时间戳-1min
-	if allFree && nowTms-tms > 60 {
-		tms = nowTms - 60
+	if !ok {
+		return 0, 0, false
 	}
-	return tms, true
+	latest, delay := job.w.GetLatestTmsAndDelay()
+	return latest, delay, true
 }
 
 //添加任务到管理map( managerjob managerconfig) 启动reader和worker
@@ -99,6 +92,8 @@ func createJob(config *ConfigInfo, cache chan string, st *scheme.Strategy) error
 		if _, ok := ManagerConfig[config.ID]; !ok {
 			ManagerConfig[config.ID] = config
 		}
+		//依赖策略的周期更新, 触发文件乱序时间戳的重置
+		ManagerJob[config.FilePath].w.ResetMaxDelay()
 		return nil
 	}
 
