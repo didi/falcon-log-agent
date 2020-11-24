@@ -234,8 +234,8 @@ func (w *Worker) producer(line string, strategy *scheme.Strategy) (*AnalysPoint,
 		t = reg.ReplaceAllString(t, rep)
 	}
 
-	// [风险]统一使用东八区
-	loc, err := time.LoadLocation("Asia/Shanghai")
+	// [风险]获取本机时区
+	loc, err := time.LoadLocation("Local")
 	tms, err := time.ParseInLocation(timeFormat, t, loc)
 	if err != nil {
 		return nil, err
