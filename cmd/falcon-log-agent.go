@@ -19,7 +19,7 @@ func main() {
 	defer g.CloseLog()
 
 	maxCoreNum := utils.GetCPULimitNum(g.Conf().MaxCPURate)
-	dlog.Infof("bind [%d] cpu core", maxCoreNum)
+	dlog.Infof("the max cpu core usage : [%d] core", maxCoreNum)
 	runtime.GOMAXPROCS(maxCoreNum)
 
 	go metric.MetricLoop(60)
