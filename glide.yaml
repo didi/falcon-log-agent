@@ -1,9 +1,0 @@
-package: github.com/didi/falcon-log-agent
-import:
-- package: github.com/gin-gonic/gin
-  version: ~1.2.0
-- package: github.com/hpcloud/tail
-  version: ~1.0.0
-- package: github.com/parnurzeal/gorequest
-  version: ~0.2.15
-- package: github.com/toolkits/nux

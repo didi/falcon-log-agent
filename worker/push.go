@@ -70,7 +70,7 @@ func PosterLoop() {
 				}
 				//先推到cache中
 				PostToCache(points)
-				//开一个协程，异步发送至odin-agent
+				//开一个协程，异步发送至falcon-agent
 				go postToFalconAgent(points)
 			}
 			time.Sleep(10 * time.Second)
