@@ -1,6 +1,10 @@
+# github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
+## explicit
+# github.com/fsnotify/fsnotify v1.6.0
+## explicit
 # github.com/gin-contrib/sse v0.1.0
 github.com/gin-contrib/sse
-# github.com/gin-gonic/gin v1.7.1
+# github.com/gin-gonic/gin v1.7.7
 ## explicit
 github.com/gin-gonic/gin
 github.com/gin-gonic/gin/binding
@@ -39,6 +43,8 @@ github.com/parnurzeal/gorequest
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# github.com/smartystreets/goconvey v1.7.2
+## explicit
 # github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07
 ## explicit
 github.com/toolkits/file
@@ -57,8 +63,9 @@ github.com/ugorji/go/codec
 golang.org/x/crypto/sha3
 # golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 golang.org/x/net/publicsuffix
-# golang.org/x/sys v0.0.0-20200116001909-b77594299b42
+# golang.org/x/sys v0.0.0-20220908164124-27713097b956
 golang.org/x/sys/cpu
+golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 # gopkg.in/fsnotify.v1 v1.4.7
 ## explicit
